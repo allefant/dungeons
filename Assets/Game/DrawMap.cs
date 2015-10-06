@@ -85,19 +85,28 @@ public static class DrawMap {
     static IEnumerable<DrawInfo> drawer (HexMap map) {
         double rx = Screen.width / 2;
         double ry = Screen.height / 2;
-        var tl = map.screen_to_tile (new Position ((xy.x - rx) / 54, (xy.y + ry + 36) / -36));
-        int x1 = (int)Math.Floor (tl.x);
-        int y1 = (int)Math.Floor (tl.y);
+        int x1, y1;
+        double left = -rx;// + 100;
+        double top = ry;// - 100;
+        double right = rx - 128; // -100;
+        double bottom = -ry;// + 100;
+        map.get_hex_position (new Position (
+            (xy.x + left) / 54, (xy.y + top) / -36), out x1, out y1);
+
         var s1 = getpos (map, x1, y1);
-        var flip = false;
+        if (s1.y - top < 0) {
+            y1--;
+            s1.x += 54;
+            s1.y += 36;
+        }
         for (; ;) {
             var x = x1;
             var y = y1;
             var s = s1;
             for (; ;) {
-                if (s.y + 72 < -ry)
+                if (s.y + 36 < bottom)
                     yield break;
-                if (s.x - 54 > rx)
+                if (s.x - 36 > right)
                     break;
 
                 yield return new DrawInfo (s, x, y);
@@ -106,6 +115,7 @@ public static class DrawMap {
                 y--;
                 s.x += 108;
             }
+            var flip = s1.x - left > 18;
             if (flip) {
                 y1++;
                 s1.x -= 54;
@@ -115,7 +125,6 @@ public static class DrawMap {
                 s1.x += 54;
                 s1.y -= 36;
             }
-            flip = !flip;
         }
     }
 

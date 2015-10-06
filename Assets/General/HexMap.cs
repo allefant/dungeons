@@ -68,10 +68,44 @@ public class HexMap {
         return new Position (s.x / 2 + s.y / 2, s.y / 2 - s.x / 2);
     }
 
+    /* Is the point bx/by left of a line from 0/0 to ax/ay?
+     * Y axis is assumed to go down.
+     * 
+     * For example a=1/0 and b=0/-1.
+     * b
+     * |
+     * 0--a
+     * 
+     * 1*-1-0*0=-1 -> yes
+     * 
+     */
     public bool is_left (double ax, double ay, double bx, double by) {
         return ax * by - ay * bx < 0;
     }
 
+    /*
+
+
+  -54                          0                          54
+     ________ ________ ________.________ ________ ________    0
+    |        |\       |    _-' | '-_    |       /|        |
+    |        | \      | _-'    |    '-_ |      / |        |
+    |        |  \    _|'       |       '|_    /  |        |
+    |________|___\____|________|________|____/___|________| 
+    |        |_-' \   |        |        |   /'-_ |        |
+    |      _-|     \  |        |        |  /    '|_       |
+    |   _-'  |  C   \ |        |        | /  D   | '-_    |
+    |________|_______\|________|________|/_______|________|   36
+    |'-_     |       /|        |        |\       |     _-'|
+    |   '-_  |  B   / |        |        | \  A   |  _-'   |
+    |      '-|     /  |        |        |  \     |-'      |
+    |________|____/___|________|________|___\____|________| 
+    |        |   /'-_ |        |        | _-'\   |        |
+    |        |  /    '|_       |       _|'    \  |        |
+    |        | /      | '-_    |    _-' |      \ |        |
+    |________|/_______|________|________|_______\|________|   72
+ 
+    */
     public void get_hex_position (Position s, out int tx, out int ty) {
         /* Given an on-screen position, return the terrain tile beneath.
          */
@@ -80,37 +114,45 @@ public class HexMap {
         int ay = (int)Math.Floor (g.y);
         g.x -= ax;
         g.y -= ay;
-        double w = 36;
-        double h = 36;
-        double px = g.x * w - g.y * w;
-        double py = g.x * h + g.y * h;
-        if (py < h) {
-            if (is_left (-w, -h * 2, px, py - h * 2)) {
+        double px = g.x * 54 - g.y * 54;
+        double py = g.x * 36 + g.y * 36;
+        bool top_half = py < 36;
+        bool A = is_left (36, 72, px, py);
+        bool B = !is_left (-36, 72, px, py);
+        bool C = is_left (-36, -72, px, py - 72);
+        bool D = !is_left (36, -72, px, py - 72);
+        /* g = 0/0 -> p = 0/0
+         * A = 0 < 0 = F
+         * B = 0 < 0 = F
+
+         * g = .4/.1 -> p = 18/18
+         * A = 36*18-72*18<0 -> T
+         * B = !-36*18-72*18<0 -> !T -> F
+         * C = -36*-54--72*18<0 -> F
+         * D = !36*-54--72*18<0 -> !T -> F
+         */
+        if (top_half) {
+            if (C) {
                 tx = ax;
                 ty = ay + 1;
-                return;
-            }
-            if (is_left (-w, h * 2, px - w, py)) {
+            } else if (D) {
                 tx = ax + 1;
                 ty = ay;
-                return;
+            } else {
+                tx = ax;
+                ty = ay;
             }
-            tx = ax;
-            ty = ay;
-            return;
         } else {
-            if (is_left (w, -h * 2, px - (-w), py - h * 2)) {
-                tx = ax;
-                ty = ay + 1;
-                return;
-            }
-            if (is_left (w, h * 2, px, py)) {
+            if (A) {
                 tx = ax + 1;
                 ty = ay;
-                return;
+            } else if (B) {
+                tx = ax;
+                ty = ay + 1;
+            } else {
+                tx = ax + 1;
+                ty = ay + 1;
             }
-            tx = ax + 1;
-            ty = ay + 1;
         }
     }
 
