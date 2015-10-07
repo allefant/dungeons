@@ -79,7 +79,8 @@ public class TileType {
     public bool wall;
     public bool animated;
     public bool tiled;
-    public bool visible;
+    public bool unblocked;
+    public bool voided;
     public int layer;
 }
 
@@ -87,8 +88,9 @@ public class HexTile {
     public TileType tile;
     public int variant;
     public TileType obj;
-    public float dark;
-    public int visible;
+    public bool go_visible;
+    public float darkness = 1.0f;
+    public bool outside = true;
 }
 
 public class TileTypes {
@@ -174,6 +176,7 @@ public class TileTypes {
             green8.png
                 ");
         tt.layer = 1;
+        tt.unblocked = true;
         add_transitions (tt, p, @"
             green-ne.png
             green-ne-se.png
@@ -355,7 +358,7 @@ public class TileTypes {
         ");
 
         p = "images/terrain/cave/";
-        add ("floor", p, @"
+        tt = add ("floor", p, @"
             floor.png
             floor2.png
             floor3.png
@@ -363,6 +366,7 @@ public class TileTypes {
             floor5.png
             floor6.png
             ");
+        tt.unblocked = true;
 
         tt = add ("wall-hewn", p, @"
             wall-rough.png
@@ -413,6 +417,7 @@ public class TileTypes {
             abyss7.png
             ");
         tt.wall = true;
+        tt.unblocked = true;
         add_transitions (tt, p, @"
             regular-concave-bl.png
             regular-concave-br.png
@@ -451,6 +456,8 @@ public class TileTypes {
         tt.animated = true;
         tt.tiled = true;
         tt.layer = 0;
+        tt.unblocked = true;
+
     }
 
     public TileType get (string name) {

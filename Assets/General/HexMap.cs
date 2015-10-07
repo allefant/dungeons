@@ -48,8 +48,11 @@ public class HexMap {
     HexTile[] map;
     public int w, h;
     //                   0   1  2  3  4   5 (6)
-    public int[] nx = { -1, -0, 1, 1, 0, -1, 0 };
-    public int[] ny = { -1, -1, 0, 1, 1, -0, 0 };
+    public static int[] nx = { -1, -0, 1, 1, 0, -1, 0 };
+    public static int[] ny = { -1, -1, 0, 1, 1, -0, 0 };
+
+    HexTile void_tile;
+    public int visibility;
 
     public Position tile_to_screen (Position t) {
         return new Position (t.x - t.y, t.x + t.y);
@@ -163,11 +166,17 @@ public class HexMap {
         for (int i = 0; i < w * h; i++) {
             map [i] = new HexTile ();
         }
+        void_tile = new HexTile ();
+        void_tile.go_visible = false;
+        void_tile.outside = true;
+        void_tile.darkness = 1;
+        void_tile.tile = new TileType ();
+        void_tile.tile.voided = true;
     }
 
     public HexTile get (int x, int y) {
         if (x < 0 || y < 0 || x >= w || y >= h)
-            return null;
+            return void_tile;
         return map [w * y + x];
     }
 
@@ -185,7 +194,7 @@ public class HexMap {
        \__/
 */
    
-    public int direction_1 (int dx, int dy) {
+    public static int direction_1 (int dx, int dy) {
         /* Return one of the two likely directions. direction_2 returns the other direction. If a
          * straight line is possible with some direction, both will return that same
          * direction. If both dx and dy are zero, returns 6.
@@ -216,7 +225,7 @@ public class HexMap {
         return 6;
     }
 
-    public int direction_2 (int dx, int dy) {
+    public static int direction_2 (int dx, int dy) {
         if (dx > 0) {
             if (dy > 0) {
                 if (dx > dy) {
@@ -256,7 +265,7 @@ public class HexMap {
         return 6;
     }
 
-    public void add_dir (ref int x, ref int y, int dir, int n = 1) {
+    public static void add_dir (ref int x, ref int y, int dir, int n = 1) {
         /*
          * Given a position ''x/y'', and a direction ''dir'' from 0 to 6, return the
          * position n tiles in that dir in ''nx/ny''.
@@ -293,7 +302,7 @@ public class HexMap {
 
 */
 
-    public int hexagon_size (int radius, bool filled) {
+    public static int hexagon_size (int radius, bool filled) {
         if (radius == 0)
             return 1;
         if (filled) {
@@ -307,7 +316,7 @@ public class HexMap {
         }
     }
 
-    public IEnumerable<HexPos> hexagon (int x, int y, int radius, int dir, bool filled) {
+    public static IEnumerable<HexPos> hexagon (int x, int y, int radius, int dir, bool filled) {
         /* Return all positions inside a hexagon with the given center and radius.
          * The first position is the center, then positions will spiral outwards,
          * starting with the given direction. A radius of 0 means only the center, a

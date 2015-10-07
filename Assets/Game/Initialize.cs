@@ -26,17 +26,24 @@ public class Initialize : MonoBehaviour {
         DrawMap.scroll (x * 4, y * 4);
         var rx = Screen.width / 2;
         var ry = Screen.height / 2;
-        var a = Initialize.cam.ScreenToWorldPoint (new Vector3 (rx / 2, ry / 2, 10));
-        var b = Initialize.cam.ScreenToWorldPoint (new Vector3 (rx * 3 / 2, ry * 3 / 2, 10));
-        var c = Initialize.cam.ScreenToWorldPoint (new Vector3 (rx * 3 / 2, ry / 2, 10));
-        var d = Initialize.cam.ScreenToWorldPoint (new Vector3 (rx / 2, ry * 3 / 2, 10));
-        Debug.DrawLine (a, b, Color.red, 0, false);
-        Debug.DrawLine (c, d, Color.red, 0, false);
 
         if (Input.GetMouseButtonDown (0)) {
             var mpos = Input.mousePosition;
             world.select (mpos.x - rx + DrawMap.xy.x,
                 mpos.y - ry + DrawMap.xy.y);
+        }
+
+        if (Input.GetKeyDown ("f1")) {
+            Debugging.draw_tiles = !Debugging.draw_tiles;
+        }
+        if (Input.GetKeyDown ("f2")) {
+            Debugging.draw_transitions = !Debugging.draw_transitions;
+        }
+        if (Input.GetKeyDown ("f3")) {
+            Debugging.draw_vertex_transitions = !Debugging.draw_vertex_transitions;
+        }
+        if (Input.GetKeyDown ("f4")) {
+            Debugging.draw_darkness = !Debugging.draw_darkness;
         }
     }
 

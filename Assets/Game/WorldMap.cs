@@ -33,6 +33,7 @@ public class WorldMap {
 
     HexMap create_overworld (int w, int h) {
         var map = new HexMap (w, h);
+        map.visibility = 9;
         var water = tiletypes.get ("water");
         var grass = tiletypes.get ("green");
         var pine = tiletypes.get ("pine");
@@ -71,6 +72,7 @@ public class WorldMap {
 
     HexMap create_dungeon_wall (int w, int h, string walltype) {
         var map = new HexMap (w, h);
+        map.visibility = 4;
         var floor = tiletypes.get ("floor");
         var wall = tiletypes.get (walltype);
         for (int y = 0; y < h; y++) {
@@ -90,6 +92,7 @@ public class WorldMap {
 
     HexMap create_dungeon_chasm (int w, int h) {
         var map = new HexMap (w, h);
+        map.visibility = 4;
         var floor = tiletypes.get ("floor");
         var abyss = tiletypes.get ("abyss");
         for (int y = 0; y < h; y++) {
